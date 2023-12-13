@@ -1,8 +1,8 @@
 import datetime
 class Product:
-    def __init__(self, idx, name, cost=0, category="none", date=datetime.date.today()):
-        self.id = idx
+    def __init__(self, id, name, cost, category=None, date=None):
+        self.id = id
         self.name = name
         self.cost = cost
-        self.category = category
-        self.date = date
+        self.category = category if category!=None else "none"
+        self.date = date if date!=None else datetime.date.today().strftime("%d.%m.%Y")

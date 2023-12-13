@@ -1,26 +1,7 @@
 import myfunctions as mf
+import storage
 from product import Product
-from myfunctions import *
-from tabulate import tabulate
-
-class CustomOutput:
-    LS = '-' #line symbol
-    #LL = 20 #line length
-
-    def print_with_lines(self, text: str, linelen=-1, symbol=LS, needspace=True) -> str:
-        if linelen==-1 : linelen=len(text)
-
-        output = (symbol * linelen + '\n' +
-              text
-              + '\n' + symbol * linelen
-              + '\n'*needspace)
-
-        return output
-
-co=CustomOutput()
-
-def view_menu():
-    print("lovi menu")
+import customoutput as co
 
 def wait_comand_input():
     menutip=co.print_with_lines("Menu - показать доступные команды")
@@ -41,27 +22,32 @@ def wait_comand_input():
 def process_input(inp: str):
 
     if inp==mf.VALIDINPUTS.get(0):
-        view_menu()
+        mf.view_menu()
     elif inp==mf.VALIDINPUTS.get(1):
-        pass
-    elif inp==mf.VALIDINPUTS.get(1):
-        pass
-    elif inp==mf.VALIDINPUTS.get(1):
-        pass
-    elif inp==mf.VALIDINPUTS.get(1):
-        pass
-    elif inp==mf.VALIDINPUTS.get(1):
-        pass
-    elif inp==mf.VALIDINPUTS.get(1):
-        pass
-    elif inp==mf.VALIDINPUTS.get(1):
-        pass
+        mf.add_element()
+    elif inp==mf.VALIDINPUTS.get(2):
+        mf.delete_element()
+    elif inp==mf.VALIDINPUTS.get(3):
+        mf.view_table()
+    elif inp==mf.VALIDINPUTS.get(4):
+        mf.sort_category()
+    elif inp==mf.VALIDINPUTS.get(5):
+        mf.sort_date()
+    elif inp==mf.VALIDINPUTS.get(6):
+        mf.sort_cost()
+    elif inp==mf.VALIDINPUTS.get(7):
+        mf.save_data()
+    elif inp==mf.VALIDINPUTS.get(8):
+        mf.exit_app()
+
+    wait_comand_input()
 
 
 
 if __name__ == '__main__':
-    wait_comand_input()
     cheese = Product(0, "сыр", 15)
-    create_element()
+    storage.add_product(cheese)
+    wait_comand_input()
+
 
 
