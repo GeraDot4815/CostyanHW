@@ -9,12 +9,12 @@ def wait_comand_input():
     wronginp=co.print_with_lines("Команда введена неверно", symbol="!")
 
     print(menutip)
-    inp = input(inputtip)
+    inp = co.liminput(inputtip)
     while not inp.lower() in mf.VALIDINPUTS.values():
         print('\n'+wronginp)
 
         print(menutip)
-        inp = input(inputtip)
+        inp = co.liminput(inputtip)
 
     inp=inp.lower()
     process_input(inp)
@@ -36,9 +36,11 @@ def process_input(inp: str):
     elif inp==mf.VALIDINPUTS.get(6):
         mf.sort_cost()
     elif inp==mf.VALIDINPUTS.get(7):
-        mf.save_data()
+        storage.save_data()
     elif inp==mf.VALIDINPUTS.get(8):
         mf.exit_app()
+    elif inp==mf.VALIDINPUTS.get(9):
+        mf.auto_view_settings()
 
     wait_comand_input()
 

@@ -9,3 +9,7 @@ def print_with_lines(text: str, linelen=-1, symbol=LS, needspace=True) -> str:
             + '\n'*needspace)
 
     return output
+
+def liminput(tip:str, limit:int=10):
+    inp=input(tip)[:limit]
+    return inp
