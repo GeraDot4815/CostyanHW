@@ -1,6 +1,5 @@
 import myfunctions as mf
 import storage
-from product import Product
 import customoutput as co
 
 def wait_comand_input():
@@ -47,14 +46,7 @@ def process_input(inp: str):
 
 
 if __name__ == '__main__':
-    cheese = Product(0, "сыр", 15, "молочная")
-    storage.add_product(cheese)
-    ch = Product(1, "чипсы", 30, "вкусняха")
-    storage.add_product(ch)
-    fh = Product(2, "рыба", 100, "буэээ", "11.03.02")
-    storage.add_product(fh)
-    kl = Product(3, "колбаса", 1, "вкусняха", "23.09.12")
-    storage.add_product(kl)
+    storage.load_data()
     wait_comand_input()
 
 

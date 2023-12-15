@@ -1,7 +1,5 @@
 import datetime
-
 import maya
-
 import customoutput as co
 import storage
 from product import Product
@@ -22,9 +20,8 @@ VALIDINPUTS={0:"menu", #Menu
 
 COSTSORTS = ["min", "max"]
 
-def enter_date_with_check():
+def enter_date_with_check(inptip="Введите дату покупки --> "):
     tip = co.print_with_lines("Рекомендуемый формат ввода даты: ДД.ММ.ГГГГ")
-    inptip = "Введите дату покупки --> "
     errortip = "!Неверный формат ввода даты!"
 
     print(tip)
@@ -95,7 +92,7 @@ def add_element():
                   "00,00"+'\n')
 
     categorytip="Введите категорию товара (Enter - пропустить) --> "
-    #datetip = "Введите дату покупки товара (Enter - сегодня) --> "
+    datetip = "Введите дату покупки товара (Enter - сегодня) --> "
 
     name = co.liminput(nametip, 25)
     cost = co.liminput(costtip)
@@ -109,14 +106,14 @@ def add_element():
     cost=check_result[1]
 
     category = co.liminput(categorytip) or None
-    date = enter_date_with_check()#co.liminput(datetip) or None
+    date = enter_date_with_check(datetip)
 
     idx=len(storage.productlist)
     pr = Product(idx, name, cost, category, date)
     storage.add_product(pr)
 
     print(co.print_with_lines("Товар успешно добавлен!"))
-    if (autotab[0]): auto_view_tab(autotab)
+    if (storage.autotab[0]): auto_view_tab(storage.autotab)
 def delete_element():
     view_all_table()
     tip="Введите ID или Название товара, который вы хотите удалить"
@@ -130,7 +127,7 @@ def delete_element():
     except ValueError:
         name=inp
     storage.delete_product(id, name)
-    if (autotab[0]): auto_view_tab(autotab)
+    if (storage.autotab[0]): auto_view_tab(storage.autotab)
 
 def view_all_table():
     table=[]
@@ -139,9 +136,7 @@ def view_all_table():
         table.append(el)
     print(tabulate(table, headers=TABHEADERS))
 
-filtercost="min"
 def cost_sort_settings():
-    global filtercost
     tip=co.print_with_lines("Min - сортировать по возрастанию цены"+'\n'+
                             "Max - сортировать по убыванию цены")
     inptip="Введите команду --> "
@@ -155,9 +150,9 @@ def cost_sort_settings():
         print(tip)
         inp = co.liminput(inptip, 3).lower()
 
-    filtercost=inp
+    storage.filtercost=inp
 
-    view_sort_cost(filtercost)
+    view_sort_cost(storage.filtercost)
 def view_sort_cost(filter): #Min/max
     idxs=[]
     for pr in storage.productlist:
@@ -174,21 +169,18 @@ def view_sort_cost(filter): #Min/max
         el=[pr.id, pr.name, pr.cost, pr.category, pr.date]
         table.append(el)
     print(tabulate(table, headers=TABHEADERS))
-
-filterdate=datetime.date.today()
 def date_sort_settings():
-    global  filterdate
     dates=[]
     for pr in storage.productlist:
         dates.append(pr.date)
     noresult = "Введенная дата не найдена"
     date=enter_date_with_check()
     if date in dates:
-        filterdate=date
+        storage.filterdate=date
     else:
         print(noresult)
         return
-    view_sort_date(filterdate)
+    view_sort_date(storage.filterdate)
 def view_sort_date(date):
     prs = []
     for pr in storage.productlist:
@@ -208,9 +200,7 @@ def view_sort_date(date):
         table.append(el)
     print(tabulate(table, headers=TABHEADERS))
 
-filtercategory="none"
 def category_sort_settings():
-    global  filtercategory
     EXITCMDS=["x","х"]
     categories=[]
     for pr in storage.productlist:
@@ -237,9 +227,9 @@ def category_sort_settings():
         print_all_cats(categories)
         inp = co.liminput(inptip)
 
-    filtercategory=inp
+    storage.filtercategory=inp
 
-    view_sort_category(filtercategory)
+    view_sort_category(storage.filtercategory)
 def view_sort_category(category):
     prs = []
     for pr in storage.productlist:
@@ -252,7 +242,6 @@ def view_sort_category(category):
         table.append(el)
     print(tabulate(table, headers=TABHEADERS))
 
-autotab=(False, "a")
 def auto_view_settings():
     valids="ackdf"
     tip=co.print_with_lines("A - выводить всю таблицу"+'\n'+
@@ -268,19 +257,19 @@ def auto_view_settings():
         print(wrongtip)
         inp=co.liminput(inptip, 1).lower()
     canview=False if inp=="f" else True
-    global autotab
-    autotab=(canview, inp)
-    auto_view_tab(autotab)
+
+    storage.autotab=(canview, inp)
+    auto_view_tab(storage.autotab)
 def auto_view_tab(settings):
     if settings[0]==False: return
     elif settings[1]=="a":
         view_all_table()
     elif settings[1]=="c":
-        view_sort_cost(filtercost)
+        view_sort_cost(storage.filtercost)
     elif settings[1]=="k":
-        view_sort_category(filtercategory)
+        view_sort_category(storage.filtercategory)
     elif settings[1]=="d":
-        view_sort_date(filterdate)
+        view_sort_date(storage.filterdate)
 
 def exit_app():
     storage.save_data()
