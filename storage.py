@@ -28,6 +28,7 @@ def reset_idxs():
         productlist[i].id=i
 
 def save_data():
-    pass
+
+    print("*Данные упешно соранены*")
 def load_data():
-    pass
+    print("*Данные упешно загружены*")

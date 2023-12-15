@@ -28,13 +28,13 @@ def process_input(inp: str):
     elif inp==mf.VALIDINPUTS.get(2):
         mf.delete_element()
     elif inp==mf.VALIDINPUTS.get(3):
-        mf.view_table()
+        mf.view_all_table()
     elif inp==mf.VALIDINPUTS.get(4):
-        mf.sort_category()
+        mf.category_sort_settings()
     elif inp==mf.VALIDINPUTS.get(5):
-        mf.sort_date()
+        mf.date_sort_settings()
     elif inp==mf.VALIDINPUTS.get(6):
-        mf.sort_cost()
+        mf.cost_sort_settings()
     elif inp==mf.VALIDINPUTS.get(7):
         storage.save_data()
     elif inp==mf.VALIDINPUTS.get(8):
@@ -47,8 +47,14 @@ def process_input(inp: str):
 
 
 if __name__ == '__main__':
-    cheese = Product(0, "сыр", 15)
+    cheese = Product(0, "сыр", 15, "молочная")
     storage.add_product(cheese)
+    ch = Product(1, "чипсы", 30, "вкусняха")
+    storage.add_product(ch)
+    fh = Product(2, "рыба", 100, "буэээ", "11.03.02")
+    storage.add_product(fh)
+    kl = Product(3, "колбаса", 1, "вкусняха", "23.09.12")
+    storage.add_product(kl)
     wait_comand_input()
 
 

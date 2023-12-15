@@ -1,5 +1,7 @@
 import datetime
 
+import maya
+
 import customoutput as co
 import storage
 from product import Product
@@ -18,6 +20,30 @@ VALIDINPUTS={0:"menu", #Menu
              8:"exit",#Exit
              9:"autoview"}
 
+COSTSORTS = ["min", "max"]
+
+def enter_date_with_check():
+    tip = co.print_with_lines("Рекомендуемый формат ввода даты: ДД.ММ.ГГГГ")
+    inptip = "Введите дату покупки --> "
+    errortip = "!Неверный формат ввода даты!"
+
+    print(tip)
+    inp = co.liminput(inptip) or None
+    if inp==None: return datetime.date.today().strftime("%d.%m.%Y")
+
+    date = datetime.date
+    errorflag = True
+
+    while errorflag:
+        try:
+            date = maya.parse(inp).datetime().date().strftime("%d.%m.%Y")
+            errorflag = False
+            break
+        except:
+            print(errortip)
+            print(tip)
+            inp = co.liminput(inptip)
+    return date
 def view_menu():
     viewtip=co.print_with_lines("View - вывести всю таблицу ваших продуктов", symbol="=")
 
@@ -69,7 +95,7 @@ def add_element():
                   "00,00"+'\n')
 
     categorytip="Введите категорию товара (Enter - пропустить) --> "
-    datetip = "Введите дату покупки товара (Enter - сегодня) --> "
+    #datetip = "Введите дату покупки товара (Enter - сегодня) --> "
 
     name = co.liminput(nametip, 25)
     cost = co.liminput(costtip)
@@ -83,7 +109,7 @@ def add_element():
     cost=check_result[1]
 
     category = co.liminput(categorytip) or None
-    date = co.liminput(datetip) or None
+    date = enter_date_with_check()#co.liminput(datetip) or None
 
     idx=len(storage.productlist)
     pr = Product(idx, name, cost, category, date)
@@ -92,7 +118,7 @@ def add_element():
     print(co.print_with_lines("Товар успешно добавлен!"))
     if (autotab[0]): auto_view_tab(autotab)
 def delete_element():
-    view_table()
+    view_all_table()
     tip="Введите ID или Название товара, который вы хотите удалить"
     print(tip)
     inp=co.liminput("--> ", 25)
@@ -106,7 +132,7 @@ def delete_element():
     storage.delete_product(id, name)
     if (autotab[0]): auto_view_tab(autotab)
 
-def view_table():
+def view_all_table():
     table=[]
     for pr in storage.productlist:
         el=[pr.id, pr.name, pr.cost, pr.category, pr.date]
@@ -116,26 +142,115 @@ def view_table():
 filtercost="min"
 def cost_sort_settings():
     global filtercost
-    sort_cost(filtercost)
-def sort_cost(filter): #Min/max
-    pass
+    tip=co.print_with_lines("Min - сортировать по возрастанию цены"+'\n'+
+                            "Max - сортировать по убыванию цены")
+    inptip="Введите команду --> "
+    errortip="!Команда введена неверно!"
+
+    print(tip)
+    inp=co.liminput(inptip, 3).lower()
+
+    while not inp in COSTSORTS:
+        print(errortip)
+        print(tip)
+        inp = co.liminput(inptip, 3).lower()
+
+    filtercost=inp
+
+    view_sort_cost(filtercost)
+def view_sort_cost(filter): #Min/max
+    idxs=[]
+    for pr in storage.productlist:
+        idxs.append([pr.id, pr.cost])
+
+    if filter==COSTSORTS[0]: #Min
+        idxs.sort(key=lambda x:x[1], reverse=False)
+    elif filter==COSTSORTS[1]:
+        idxs.sort(key=lambda x:x[1],reverse=True)
+
+    table=[]
+    for i in idxs:
+        pr=storage.productlist[i[0]]
+        el=[pr.id, pr.name, pr.cost, pr.category, pr.date]
+        table.append(el)
+    print(tabulate(table, headers=TABHEADERS))
 
 filterdate=datetime.date.today()
 def date_sort_settings():
     global  filterdate
-    sort_date(filterdate)
-def sort_date(date):
-    pass
+    dates=[]
+    for pr in storage.productlist:
+        dates.append(pr.date)
+    noresult = "Введенная дата не найдена"
+    date=enter_date_with_check()
+    if date in dates:
+        filterdate=date
+    else:
+        print(noresult)
+        return
+    view_sort_date(filterdate)
+def view_sort_date(date):
+    prs = []
+    for pr in storage.productlist:
+        if pr.date == date:
+            prs.append(pr)
+    noresult=co.print_with_lines("В указанную дату не было совершено покупок"+'\n'+
+                                 "Введите 'SortD', чтобы изменить настройки сортировки по дате", symbol="*",
+                                 linelen=len("Введите 'SortD', чтобы изменить настройки сортировки по дате"))
+
+    if(len(prs)==0):
+        print(noresult)
+        return
+
+    table = []
+    for pr in prs:
+        el = [pr.id, pr.name, pr.cost, pr.category, pr.date]
+        table.append(el)
+    print(tabulate(table, headers=TABHEADERS))
 
 filtercategory="none"
 def category_sort_settings():
     global  filtercategory
-    sort_category(filtercategory)
-def sort_category(category):
-    pass
+    EXITCMDS=["x","х"]
+    categories=[]
+    for pr in storage.productlist:
+        categories.append(pr.category)
+    def print_all_cats(categories):
+        linelen=10
+        print("Доступные для сортировки категории:"+'\n'+
+              '-'*linelen)
+        for ct in categories:
+            print(ct)
+        print('-'*linelen)
+        print('\n'+"Для выхода из функции введите 'X'")
 
-def exit_app():
-    pass
+    inptip="Введите команду --> "
+    errortip="!Введенная категория не найдена!"
+
+    print_all_cats(categories)
+    inp=co.liminput(inptip)
+
+    if inp.lower() in EXITCMDS: return
+
+    while not inp in categories:
+        print(errortip)
+        print_all_cats(categories)
+        inp = co.liminput(inptip)
+
+    filtercategory=inp
+
+    view_sort_category(filtercategory)
+def view_sort_category(category):
+    prs = []
+    for pr in storage.productlist:
+        if pr.category==category:
+            prs.append(pr)
+
+    table = []
+    for pr in prs:
+        el = [pr.id, pr.name, pr.cost, pr.category, pr.date]
+        table.append(el)
+    print(tabulate(table, headers=TABHEADERS))
 
 autotab=(False, "a")
 def auto_view_settings():
@@ -148,11 +263,10 @@ def auto_view_settings():
     wrongtip="!Опция введена неверно!"+'\n'+"Для ввода доступны команды: A, C, K, D"
     inptip="Выберите одну из опций --> "
     print(tip)
-    inp=co.liminput(inptip, 1)
-    inp.lower()
+    inp=co.liminput(inptip, 1).lower()
     while not inp in valids:
         print(wrongtip)
-        inp=co.liminput(inptip, 1)
+        inp=co.liminput(inptip, 1).lower()
     canview=False if inp=="f" else True
     global autotab
     autotab=(canview, inp)
@@ -160,10 +274,14 @@ def auto_view_settings():
 def auto_view_tab(settings):
     if settings[0]==False: return
     elif settings[1]=="a":
-        view_table()
+        view_all_table()
     elif settings[1]=="c":
-        cost_sort_settings()
+        view_sort_cost(filtercost)
     elif settings[1]=="k":
-        category_sort_settings()
+        view_sort_category(filtercategory)
     elif settings[1]=="d":
-        date_sort_settings()
+        view_sort_date(filterdate)
+
+def exit_app():
+    storage.save_data()
+    exit()
