@@ -7,6 +7,5 @@ class Product:
         self.name = name
         self.cost = cost
         self.category = category if category!=None else "none"
-        #self.date = date
         self.date = maya.parse(date).datetime().date().strftime("%d.%m.%Y") if date!=None\
             else datetime.date.today().strftime("%d.%m.%Y")
