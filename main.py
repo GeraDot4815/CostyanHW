@@ -46,7 +46,9 @@ def process_input(inp: str):
 
 
 if __name__ == '__main__':
-    storage.load_data()
+    try: storage.load_data()
+    except: pass
+
     wait_comand_input()
 
 
